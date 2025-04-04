@@ -31,15 +31,11 @@ A platform designed for AI and Machine Learning enthusiasts to experiment, learn
 
 To run the project, follow these steps:
 
-1. Start the Streamlit application:
+Start the Streamlit application:
     ```bash
     streamlit run app.py
     ```
-2. Open the provided local URL in your browser to access the application.
 
-Provide additional instructions and examples for using the project. For example:
-```bash
-python main.py
 ```
 
 ## Features
