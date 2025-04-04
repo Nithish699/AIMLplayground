@@ -29,7 +29,15 @@ A platform designed for AI and Machine Learning enthusiasts to experiment, learn
 
 ## Usage
 
-Provide instructions and examples for using the project. For example:
+To run the project, follow these steps:
+
+1. Start the Streamlit application:
+    ```bash
+    streamlit run app.py
+    ```
+2. Open the provided local URL in your browser to access the application.
+
+Provide additional instructions and examples for using the project. For example:
 ```bash
 python main.py
 ```
@@ -39,6 +47,7 @@ python main.py
 - Pre-built AI/ML models for quick experimentation.
 - Access to curated datasets for training and testing.
 - Interactive tools for visualizing and analyzing results.
+- Streamlit-based user interface for seamless interaction.
 
 ## Contributing
 
