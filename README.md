@@ -32,7 +32,7 @@ A platform designed for AI and Machine Learning enthusiasts to experiment, learn
 To run the project, follow these steps:
 
 Start the Streamlit application:
-    ```bash
+    ```sh
     streamlit run app.py
     ```
 
