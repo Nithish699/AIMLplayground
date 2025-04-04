@@ -14,22 +14,22 @@ A brief description of what this project does and who it's for.
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/your-username/your-repo.git
+    git clone https://github.com/Nithish699/AIMLplayground.git
     ```
 2. Navigate to the project directory:
     ```bash
-    cd your-repo
+    cd AIMLplayground
     ```
 3. Install dependencies:
     ```bash
-    npm install
+    pip install -r requirements.txt
     ```
 
 ## Usage
 
 Provide instructions and examples for using the project. For example:
 ```bash
-npm start
+python main.py
 ```
 
 ## Features
