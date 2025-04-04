@@ -1,8 +1,10 @@
 # Project Title
 
-AIML Playground
+**AIML Playground**
 
 A platform designed for AI and Machine Learning enthusiasts to experiment, learn, and build projects. This project provides tools, datasets, and pre-built models to accelerate your AI/ML journey.
+
+---
 
 ## Table of Contents
 
@@ -11,6 +13,8 @@ A platform designed for AI and Machine Learning enthusiasts to experiment, learn
 - [Features](#features)
 - [Contributing](#contributing)
 - [License](#license)
+
+---
 
 ## Installation
 
@@ -27,16 +31,13 @@ A platform designed for AI and Machine Learning enthusiasts to experiment, learn
     pip install -r requirements.txt
     ```
 
-## Usage
 
-To run the project, follow these steps:
-
-Start the Streamlit application:
-    ```sh
+4. Start the Streamlit application:
+    ```bash
     streamlit run app.py
     ```
 
-```
+---
 
 ## Features
 
@@ -44,6 +45,8 @@ Start the Streamlit application:
 - Access to curated datasets for training and testing.
 - Interactive tools for visualizing and analyzing results.
 - Streamlit-based user interface for seamless interaction.
+
+---
 
 ## Contributing
 
@@ -64,6 +67,9 @@ Contributions are welcome! Please follow these steps:
     ```
 5. Open a pull request.
 
+---
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
