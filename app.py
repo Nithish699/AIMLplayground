@@ -228,65 +228,69 @@ elif model_choice == "Classification":
     import seaborn as sns
     import matplotlib.pyplot as plt
     import joblib
-    from sklearn.ensemble import GradientBoostingClassifier
-    from sklearn.preprocessing import LabelEncoder
-    from sklearn.metrics import accuracy_score, confusion_matrix
+    from sklearn.metrics import confusion_matrix
 
-# Load model and encofromders
-    model_path = "EAgradient_boosting_model.pkl"
-    encoder_path = "EAlabel_encoders.pkl"
+    # Load model and encoders
+    gb_model = joblib.load("EAgradient_boosting_model.pkl")
+    label_encoders = joblib.load("EAlabel_encoders.pkl")
 
-    gb_model = joblib.load(model_path)
-    label_encoders = joblib.load(encoder_path)
-
-# Define UI layout
+    # Title in main area
     st.title("Employee Attrition Prediction")
-    st.sidebar.header("Enter Employee Details")
 
-# Input fields
-    age = st.sidebar.number_input("Age", min_value=18, max_value=65, value=30)
-    years_at_company = st.sidebar.number_input("Years at Company", min_value=0, max_value=40, value=5)
-    monthly_income = st.sidebar.number_input("Monthly Income", min_value=1000, max_value=50000, value=5000)
-    job_satisfaction = st.sidebar.slider("Job Satisfaction", 1, 5, 3)
-    performance_rating = st.sidebar.slider("Performance Rating", 1, 5, 3)
-    overtime = st.sidebar.selectbox("Overtime", ["Yes", "No"])
-    distance_from_home = st.sidebar.number_input("Distance from Home", min_value=1, max_value=50, value=10)
-    education_level = st.sidebar.slider("Education Level", 1, 5, 3)
-    job_level = st.sidebar.slider("Job Level", 1, 5, 3)
-    company_reputation = st.sidebar.slider("Company Reputation", 1, 5, 3)
+    # INPUTS IN SIDEBAR
+    with st.sidebar:
+        st.header("Enter Employee Details")
+        age = st.number_input("Age", min_value=18, max_value=65, value=30)
+        years_at_company = st.number_input("Years at Company", min_value=0, max_value=40, value=5)
+        monthly_income = st.number_input("Monthly Income", min_value=1000, max_value=50000, value=5000)
+        job_satisfaction = st.slider("Job Satisfaction", 1, 5, 3)
+        performance_rating = st.slider("Performance Rating", 1, 5, 3)
+        overtime = st.selectbox("Overtime", ["Yes", "No"])
+        distance_from_home = st.number_input("Distance from Home", min_value=1, max_value=50, value=10)
+        education_level = st.slider("Education Level", 1, 5, 3)
+        job_level = st.slider("Job Level", 1, 5, 3)
+        company_reputation = st.slider("Company Reputation", 1, 5, 3)
+        predict_button = st.button("Predict Attrition")
 
-# Convert input into DataFrame
-    input_data = pd.DataFrame({
-     "Age": [age],
-     "Years at Company": [years_at_company],
-     "Monthly Income": [monthly_income],
-     "Job Satisfaction": [job_satisfaction],
-     "Performance Rating": [performance_rating],
-     "Overtime": [label_encoders["Overtime"].transform([overtime])[0]],
-     "Distance from Home": [distance_from_home],
-     "Education Level": [education_level],
-     "Job Level": [job_level],
-     "Company Reputation": [company_reputation]
-    })
+    # RESULTS IN MAIN AREA (BELOW TITLE)
+    if predict_button:
+        input_data = pd.DataFrame({
+            "Age": [age],
+            "Years at Company": [years_at_company],
+            "Monthly Income": [monthly_income],
+            "Job Satisfaction": [job_satisfaction],
+            "Performance Rating": [performance_rating],
+            "Overtime": [label_encoders["Overtime"].transform([overtime])[0]],
+            "Distance from Home": [distance_from_home],
+            "Education Level": [education_level],
+            "Job Level": [job_level],
+            "Company Reputation": [company_reputation]
+        })
 
-# Prediction
-    if st.sidebar.button("Predict Attrition"):
-       prediction = gb_model.predict(input_data)[0]
-
-       attrition_result = "Left" if prediction == 1 else "Stayed"
-       st.write(f"### Prediction: {attrition_result}")
-
-    # Confusion Matrix Plot
-       y_test = [0, 1, 0, 1]  # Dummy values for labels
-       y_pred = [0, 1, 1, 0]  # Dummy values for predictions
-       conf_matrix = confusion_matrix(y_test, y_pred)
-       plt.figure(figsize=(6, 4))
-       sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=['Stayed', 'Left'], yticklabels=['Stayed', 'Left'])
-       plt.xlabel('Predicted')
-       plt.ylabel('Actual')
-       plt.title('Confusion Matrix')
-       st.pyplot(plt)
-
+        prediction = gb_model.predict(input_data)[0]
+        result = "Left" if prediction == 1 else "Stayed"
+        
+        # Main area results
+        st.subheader("Prediction Results")
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.metric("Attrition Status", result)
+        
+        with col2:
+            # Confusion Matrix Visualization
+            st.write("Model Performance")
+            y_test = [0, 1, 0, 1]  # Example data
+            y_pred = [0, 1, 1, 0]   # Example data
+            conf_matrix = confusion_matrix(y_test, y_pred)
+            
+            fig, ax = plt.subplots()
+            sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues',
+                       xticklabels=['Stayed', 'Left'],
+                       yticklabels=['Stayed', 'Left'])
+            ax.set_xlabel('Predicted')
+            ax.set_ylabel('Actual')
+            st.pyplot(fig)
 #==================================================================================================|
 elif model_choice == "Recommendation":
    
