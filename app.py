@@ -41,32 +41,61 @@ st.write("Here, you can explore various machine learning models like Regression,
 # Get the current date and time
 current_time = datetime.now()
 
-# Display the current date and time in the top-right corner
-
+# Display the current date and time in the bottom-right corner
 st.markdown(f"""
-    <style>
-        .datetime {{
-        position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            color:#EE82EE;
-            display: inline-block;
-            animation: fadeInOut 5s infinite;
-        }}
+<style>
+    .datetime-container {{
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+    }}
+    
+    .datetime {{
+        background: linear-gradient(135deg, #33cc33, #009900);
+        color: white;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(50, 255, 50, 0.4);
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid rgba(255,255,255,0.3);
+        animation: heartbeat 1.8s infinite;
+        transition: all 0.3s ease;
+    }}
+    
+    .datetime-icon {{
+        font-size: 18px;
+        color: white;
+    }}
+    
+    @keyframes heartbeat {{
+        0% {{ transform: scale(1); }}
+        25% {{ transform: scale(1.03); }}
+        50% {{ transform: scale(1); }}
+        75% {{ transform: scale(1.03); }}
+        100% {{ transform: scale(1); }}
+    }}
+    
+    .datetime:hover {{
+        background: linear-gradient(135deg, #009900, #006600);
+        transform: scale(1.05) !important;
+        box-shadow: 0 6px 20px rgba(0, 153, 0, 0.6);
+    }}
+</style>
 
-        @keyframes fadeInOut {{
-            0% {{ opacity: 0; }}
-            50% {{ opacity: 1; }}
-            100% {{ opacity: 0; }}
-        }}
-    </style>
-    <div class="datetime">Current Date and Time: {current_time.strftime('%Y-%m-%d %H:%M:%S')}</div>
+<div class="datetime-container">
+    <div class="datetime">
+        <span class="datetime-icon">⏱</span>
+        {current_time.strftime('%Y-%m-%d %H:%M:%S')}
+    </div>
+</div>
 """, unsafe_allow_html=True)
-# In markdown HTML and inline CSS included
-
-
 #----------------------------------------sidebar--------------------------------------------------|
 
 # Sidebar content
