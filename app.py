@@ -660,26 +660,34 @@ import streamlit as st
 if "rating_submitted" not in st.session_state:
     st.session_state.rating_submitted = False
     st.session_state.rating = 3
+    st.session_state.show_rating_form = False  # Controls whether form is visible
 
-# Main button to open rating form
+# --- Rating Logic ---
 if not st.session_state.rating_submitted:
     if st.button("Rate This App 🌟"):
         st.session_state.show_rating_form = True
 
-# Show rating form only when button is clicked
-if not st.session_state.rating_submitted and st.session_state.get("show_rating_form", False):
+# Show rating form (if button clicked OR user wants to change rating)
+if st.session_state.show_rating_form:
     with st.form("rating_form"):
         st.subheader("We value your feedback!")
-        rating = st.slider("Rate this app (1-5 stars)", 1, 5, 3)
-        if st.form_submit_button("Submit"):
+        new_rating = st.slider("Rate this app (1-5 stars)", 1, 5, st.session_state.rating)
+        
+        if st.form_submit_button("Submit Rating"):
             st.session_state.rating_submitted = True
-            st.session_state.rating = rating
+            st.session_state.rating = new_rating
+            st.session_state.show_rating_form = False  # Hide form after submit
             st.rerun()
 
-# Thank you message area (only shows after submission)
+# --- After Submission ---
 if st.session_state.rating_submitted:
-    st.subheader("Thank you for your feedback! 🌟")
-    st.success(f"You rated this app {st.session_state.rating} star(s)")
+    st.subheader("We appreciate your feedback! 💖")
+    st.success(f"ThankYou rating: {st.session_state.rating} ⭐ out of 5")
+    
+    # "Change Rating" button
+    if st.button("✏️ Change Rating"):
+        st.session_state.show_rating_form = True  # Show form again
+        st.rerun()
 
 
 
