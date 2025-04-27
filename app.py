@@ -654,22 +654,35 @@ if st.session_state['chatbot_open']:
 #==================================================Rating======================================================|
 # Add custom CSS for the bottom-right position of the rating section
 
+import streamlit as st
 
+# Initialize session state
 if "rating_submitted" not in st.session_state:
-    st.session_state["rating_submitted"] = False
-    st.session_state["rating"] = 3  # Default rating value
+    st.session_state.rating_submitted = False
+    st.session_state.rating = 3
 
-if st.button("Rate This App 🌟"):
-    # Rating section
+# Main button to open rating form
+if not st.session_state.rating_submitted:
+    if st.button("Rate This App 🌟"):
+        st.session_state.show_rating_form = True
+
+# Show rating form only when button is clicked
+if not st.session_state.rating_submitted and st.session_state.get("show_rating_form", False):
     with st.form("rating_form"):
         st.subheader("We value your feedback!")
-        st.session_state["rating"] = st.slider("How would you rate this app? (1-5 stars)", min_value=1, max_value=5, value=3, step=1, key="rating_slider")
-        submit_button = st.form_submit_button("Submit Rating")
-        if submit_button:
-            st.session_state["rating_submitted"] = True
+        rating = st.slider("Rate this app (1-5 stars)", 1, 5, 3)
+        if st.form_submit_button("Submit"):
+            st.session_state.rating_submitted = True
+            st.session_state.rating = rating
+            st.rerun()
 
-if st.session_state.get("rating_submitted", False):
-    st.success(f"Thank you for rating us {st.session_state['rating']} star(s)! 🌟")
+# Thank you message area (only shows after submission)
+if st.session_state.rating_submitted:
+    st.subheader("Thank you for your feedback! 🌟")
+    st.success(f"You rated this app {st.session_state.rating} star(s)")
+
+
+
 
 #=================================================Footer======================================================|
 # Footer section
