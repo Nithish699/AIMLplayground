@@ -603,7 +603,6 @@ dark_mode = st.checkbox("Enable Dark Mode")
 apply_styles(dark_mode)
 
 #=====================================================================Chatbot============================================================|
-import streamlit as st
 
 import streamlit as st
 
@@ -627,13 +626,10 @@ if 'chatbot_open' not in st.session_state:
 if 'conversation' not in st.session_state:
     st.session_state['conversation'] = []
 
-# Open or close chatbot
-if st.button("🤖 Open Chatbot"):
-    st.session_state['chatbot_open'] = True
-
-if st.button("❌ Close Chatbot"):
-    st.session_state['chatbot_open'] = False
-    st.session_state['conversation'] = []
+# Open chatbot
+if not st.session_state['chatbot_open']:
+    if st.button("🤖 Open Chatbot"):
+        st.session_state['chatbot_open'] = True
 
 # Chatbot UI with nested options
 if st.session_state['chatbot_open']:
@@ -650,7 +646,10 @@ if st.session_state['chatbot_open']:
     for message in st.session_state['conversation']:
         st.write(message)
 
-
+    # Close chatbot button below conversation
+    if st.button("❌ Close Chatbot"):
+        st.session_state['chatbot_open'] = False
+        st.session_state['conversation'] = []
 
 #==================================================Rating======================================================|
 # Add custom CSS for the bottom-right position of the rating section
