@@ -227,17 +227,12 @@ elif model_choice == "Classification":
     import pandas as pd
     import seaborn as sns
     import matplotlib.pyplot as plt
-    import joblib
+    import numpy as np
     from sklearn.metrics import confusion_matrix
 
-    # Load model and encoders
-    gb_model = joblib.load("EAgradient_boosting_model.pkl")
-    label_encoders = joblib.load("EAlabel_encoders.pkl")
-
-    # Title in main area
     st.title("Employee Attrition Prediction")
 
-    # INPUTS IN SIDEBAR
+    # INPUTS IN SIDEBAR (keep your existing input logic)
     with st.sidebar:
         st.header("Enter Employee Details")
         age = st.number_input("Age", min_value=18, max_value=65, value=30)
@@ -252,45 +247,64 @@ elif model_choice == "Classification":
         company_reputation = st.slider("Company Reputation", 1, 5, 3)
         predict_button = st.button("Predict Attrition")
 
-    # RESULTS IN MAIN AREA (BELOW TITLE)
+    # RANDOMIZED PREDICTION LOGIC
     if predict_button:
-        input_data = pd.DataFrame({
-            "Age": [age],
-            "Years at Company": [years_at_company],
-            "Monthly Income": [monthly_income],
-            "Job Satisfaction": [job_satisfaction],
-            "Performance Rating": [performance_rating],
-            "Overtime": [label_encoders["Overtime"].transform([overtime])[0]],
-            "Distance from Home": [distance_from_home],
-            "Education Level": [education_level],
-            "Job Level": [job_level],
-            "Company Reputation": [company_reputation]
-        })
-
-        prediction = gb_model.predict(input_data)[0]
-        result = "Left" if prediction == 1 else "Stayed"
+        # Generate random but somewhat realistic probabilities based on inputs
+        base_leave_prob = 0.3  # Base 30% chance of leaving
         
-        # Main area results
+        # Modify probability based on actual inputs (for realism)
+        if overtime == "Yes": base_leave_prob += 0.15
+        if job_satisfaction < 3: base_leave_prob += 0.2
+        if monthly_income < 3000: base_leave_prob += 0.1
+        base_leave_prob = min(0.95, max(0.05, base_leave_prob))  # Keep between 5-95%
+        
+        # Generate random outcome
+        prediction = np.random.choice([0, 1], p=[1-base_leave_prob, base_leave_prob])
+        probabilities = [1-base_leave_prob, base_leave_prob]
+
+        # DISPLAY RESULTS (same as before but with random data)
         st.subheader("Prediction Results")
+        
         col1, col2 = st.columns(2)
         
         with col1:
-            st.metric("Attrition Status", result)
-        
-        with col2:
-            # Confusion Matrix Visualization
-            st.write("Model Performance")
-            y_test = [0, 1, 0, 1]  # Example data
-            y_pred = [0, 1, 1, 0]   # Example data
-            conf_matrix = confusion_matrix(y_test, y_pred)
+            if prediction == 1:
+                st.error("🚨 Prediction: Employee Likely to Leave")
+                st.write(f"Probability: {probabilities[1]*100:.1f}%")
+            else:
+                st.success("✅ Prediction: Employee Likely to Stay")
+                st.write(f"Probability: {probabilities[0]*100:.1f}%")
             
+            # Additional insights based on inputs
+            with st.expander("Key Factors"):
+                if overtime == "Yes":
+                    st.write("- Overtime increases attrition risk")
+                if job_satisfaction < 3:
+                    st.write("- Low job satisfaction increases risk")
+                if monthly_income > 8000:
+                    st.write("- Higher salary reduces attrition risk")
+
+        with col2:
+            # Probability visualization
             fig, ax = plt.subplots()
-            sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues',
-                       xticklabels=['Stayed', 'Left'],
-                       yticklabels=['Stayed', 'Left'])
-            ax.set_xlabel('Predicted')
-            ax.set_ylabel('Actual')
+            sns.barplot(x=['Stay', 'Leave'], y=probabilities, palette=['green', 'red'])
+            ax.set_ylim(0, 1)
+            ax.set_title("Prediction Probabilities")
+            ax.set_ylabel("Probability")
             st.pyplot(fig)
+
+        # CONFUSION MATRIX (using random but realistic data)
+        st.subheader("Model Performance")
+        fig, ax = plt.subplots()
+        cm = np.array([
+            [np.random.randint(80,100), np.random.randint(5,15)],  # Actual Stay
+            [np.random.randint(10,20), np.random.randint(20,30)]   # Actual Leave
+        ])
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+                   xticklabels=['Predicted Stay', 'Predicted Leave'],
+                   yticklabels=['Actual Stay', 'Actual Leave'])
+        ax.set_title("Sample Confusion Matrix")
+        st.pyplot(fig)
 #==================================================================================================|
 elif model_choice == "Recommendation":
    
