@@ -38,7 +38,6 @@ st.write("Here, you can explore various machine learning models like Regression,
 
 #--------------------------------------current time----------------------------------------------------|
 
-
 # Get the current date and time
 current_time = datetime.now()
 
@@ -66,6 +65,7 @@ st.markdown(f"""
     <div class="datetime">Current Date and Time: {current_time.strftime('%Y-%m-%d %H:%M:%S')}</div>
 """, unsafe_allow_html=True)
 # In markdown HTML and inline CSS included
+
 
 #----------------------------------------sidebar--------------------------------------------------|
 
