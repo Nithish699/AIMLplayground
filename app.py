@@ -77,57 +77,151 @@ st.sidebar.text("Select the model from below.")
 # Add options to sidebar (you can modify these as per your project)
 model_choice = st.sidebar.selectbox(
     "Choose a Model to Explore",
-    ["Not Yet choose the model","Regression", "Classification", "Recommendation", "NLP","Create a Report"]
+    ["HAVE SOME FUN(play a game)","Regression", "Classification", "Recommendation", "NLP","Create a Report"]
 )
 
 
 #------------------------------------------------------------------------------------------|
-# Main content area
-if model_choice=="Not Yet choose the model":
+if model_choice == "HAVE SOME FUN(play a game)":
     import streamlit as st
     import random
-    import time
+    from time import sleep
+    import streamlit.components.v1 as components
 
-# Set Page Title
-    st.title("🎮 Fun Game Hub")
+    # Custom CSS for animations and styling
+    st.markdown("""
+    <style>
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+        40% {transform: translateY(-20px);}
+        60% {transform: translateY(-10px);}
+    }
+    .bounce {animation: bounce 1s;}
+    .game-title {color: #4a4a4a; border-bottom: 2px solid #6a5acd; padding-bottom: 5px;}
+    .win {color: #2ecc71; font-weight: bold;}
+    .lose {color: #e74c3c; font-weight: bold;}
+    .tie {color: #f39c12; font-weight: bold;}
+    </style>
+    """, unsafe_allow_html=True)
 
-# Sidebar for Game Selection
-    game = st.radio("Choose a Game:", ["Rock, Paper, Scissors", "Number Guessing"])
+    # Set Page Title with emoji
+    st.markdown('<h1 class="game-title">🎮 Ultimate Game Hub</h1>', unsafe_allow_html=True)
 
-# ------------------- 1️⃣ Rock, Paper, Scissors -------------------
+    # Game selection with nicer layout
+    st.sidebar.header("Game Selection")
+    game = st.sidebar.radio("Choose your game:", 
+                          ["Rock, Paper, Scissors", "Number Guessing", "Dice Roll Challenge"])
+
+    # ------------------- 1️⃣ Enhanced Rock, Paper, Scissors -------------------
     if game == "Rock, Paper, Scissors":
-        st.subheader("✊📄✂️ Rock, Paper, Scissors Game")
+        st.subheader("✊ 📄 ✂️ Ultimate RPS Battle")
+        st.markdown("**Best of 3 wins!**")
+        
+        if 'rps_score' not in st.session_state:
+            st.session_state.rps_score = {'wins': 0, 'losses': 0, 'ties': 0}
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("✊ Rock", key="rock"):
+                user_choice = "Rock"
+        with col2:
+            if st.button("📄 Paper", key="paper"):
+                user_choice = "Paper"
+        with col3:
+            if st.button("✂️ Scissors", key="scissors"):
+                user_choice = "Scissors"
+        
+        if 'user_choice' in locals():
+            with st.spinner('Computer is choosing...'):
+                sleep(1)  # Dramatic delay
+                computer_choice = random.choice(["Rock", "Paper", "Scissors"])
+                
+                # Display choices with animation
+                st.markdown(f"""
+                <div class="bounce">
+                <p>You chose: <strong>{user_choice}</strong></p>
+                <p>Computer chose: <strong>{computer_choice}</strong></p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Determine winner
+                if user_choice == computer_choice:
+                    st.session_state.rps_score['ties'] += 1
+                    result = '<p class="tie">⚔️ It\'s a tie!</p>'
+                elif (user_choice == "Rock" and computer_choice == "Scissors") or \
+                     (user_choice == "Paper" and computer_choice == "Rock") or \
+                     (user_choice == "Scissors" and computer_choice == "Paper"):
+                    st.session_state.rps_score['wins'] += 1
+                    result = '<p class="win">🏆 You win this round!</p>'
+                else:
+                    st.session_state.rps_score['losses'] += 1
+                    result = '<p class="lose">💥 Computer wins this round!</p>'
+                
+                st.markdown(result, unsafe_allow_html=True)
+                
+                # Score display
+                st.write(f"Score: Wins: {st.session_state.rps_score['wins']} | "
+                        f"Losses: {st.session_state.rps_score['losses']} | "
+                        f"Ties: {st.session_state.rps_score['ties']}")
 
-        choices = ["Rock", "Paper", "Scissors"]
-        user_choice = st.selectbox("Choose your move:", choices)
-        computer_choice = random.choice(choices)
-
-        if st.button("Play!"):
-            st.write(f"🤖 Computer chose: {computer_choice}")
-            if user_choice == computer_choice:
-               st.write("⚖️ It's a tie!")
-            elif (user_choice == "Rock" and computer_choice == "Scissors") or \
-                (user_choice == "Paper" and computer_choice == "Rock") or \
-                (user_choice == "Scissors" and computer_choice == "Paper"):
-                st.success("🎉 You Win!")
-            else:
-               st.error("😞 You Lose!")
-
-# ------------------- 2️⃣ Number Guessing -------------------
+    # ------------------- 2️⃣ Enhanced Number Guessing -------------------
     elif game == "Number Guessing":
-        st.subheader("🔢 Number Guessing Game")
-        number = random.randint(1, 10)
-
-        user_guess = st.number_input("Guess a number between 1 and 10:", min_value=1, max_value=100, step=1)
-        if st.button("Check"):
-            if user_guess == number:
-               st.success("🎉 Correct! You guessed the number!")
-            elif user_guess > number:
-               st.warning("📉 Too high! Try again.")
+        st.subheader("🔢 Extreme Number Guesser")
+        
+        if 'target_number' not in st.session_state:
+            st.session_state.target_number = random.randint(1, 100)
+            st.session_state.guesses = []
+            st.session_state.hint = ""
+        
+        guess = st.number_input("Guess a number (1-100):", min_value=1, max_value=100)
+        
+        if st.button("Submit Guess"):
+            st.session_state.guesses.append(guess)
+            
+            if guess == st.session_state.target_number:
+                st.balloons()
+                st.success(f"🎉 Genius! You got it in {len(st.session_state.guesses)} tries!")
+                st.session_state.target_number = random.randint(1, 100)
+                st.session_state.guesses = []
             else:
-                st.warning("📈 Too low! Try again.")
+                difference = abs(guess - st.session_state.target_number)
+                if difference <= 5:
+                    st.session_state.hint = "🔥 Extremely Close!"
+                elif difference <= 15:
+                    st.session_state.hint = "🌟 Very Close!"
+                elif difference <= 30:
+                    st.session_state.hint = "✨ Close!"
+                else:
+                    st.session_state.hint = "❄️ Far Away!"
+                
+                st.warning(f"{'Higher!' if guess < st.session_state.target_number else 'Lower!'} {st.session_state.hint}")
+                st.write(f"Previous guesses: {', '.join(map(str, st.session_state.guesses))}")
 
-
+    # ------------------- 3️⃣ NEW GAME: Dice Roll Challenge -------------------
+    elif game == "Dice Roll Challenge":
+        st.subheader("🎲 Dice Roll Showdown")
+        
+        if st.button("Roll the Dice!"):
+            with st.spinner('Rolling...'):
+                sleep(1.5)
+                user_roll = random.randint(1, 6)
+                computer_roll = random.randint(1, 6)
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown(f"<h3>Your Roll:</h3>", unsafe_allow_html=True)
+                    st.markdown(f"<h1 style='text-align: center;'>🎲 {user_roll}</h1>", unsafe_allow_html=True)
+                
+                with col2:
+                    st.markdown(f"<h3>Computer's Roll:</h3>", unsafe_allow_html=True)
+                    st.markdown(f"<h1 style='text-align: center;'>🎲 {computer_roll}</h1>", unsafe_allow_html=True)
+                
+                if user_roll > computer_roll:
+                    st.success("🎉 You win this roll!")
+                elif user_roll < computer_roll:
+                    st.error("😱 Computer wins this roll!")
+                else:
+                    st.warning("🤝 It's a tie!")
 #--------------------------------------------------------------------------------------|
     
  
