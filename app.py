@@ -5,36 +5,68 @@ import numpy as np
 import joblib
 import matplotlib.pyplot as plt
 #==============================================================================================|
-
-# Customizing header
 st.markdown("""
- <style>
-        .header2 {
-            font-size: 40px;
-            color: #4CAF50;
-            font-weight: bold;
-            cursor: pointer;
-            text-align:center;
-        
-           transition: all 0.3s ease;  /* Smooth transition */
-        }
-        .header2:hover {
-            color: #FF5733;  /* Change to a different color on hover */
-            text-decoration: underline;  /* Underline text on hover */
-            transform: scale(1.1);  /* Increase font size on hover */
-        }
-        .main{
-            background-color: #4CAF50;  /* Light blue color */
-            
-        }
-    </style>
-    <h1  class="header2">Welcome to the AI & ML Playground</h1>
-    <h3  style="text-align: center; color:white;background-color:#4CAF50">Explore, Experiment, and Learn with Interactive Models!</h3>
-    
-    """, unsafe_allow_html=True)
+<style>
+    .header-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        text-align: center;
+    }
 
-# Main content area for your ML models (you can replace this with your actual app content)
-st.write("Here, you can explore various machine learning models like Regression, Classification, and more!")
+    .main-header {
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: #ff0000;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
+        text-shadow: 2px 2px 4px rgba(255, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .main-header:hover {
+        transform: translateY(-2px);
+        text-shadow: 3px 3px 6px rgba(255, 0, 0, 0.3);
+    }
+
+    .sub-header {
+        font-size: 1.4rem;
+        font-weight: 500;
+        color: white;
+        background-color: #ff3333;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        margin: 0.5rem auto;
+        display: inline-block;
+        box-shadow: 0 4px 8px rgba(255, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .sub-header:hover {
+        transform: translateY(-2px);
+        text-shadow: 3px 3px 6px rgba(255, 0, 0, 0.3);
+    }
+
+    .description {
+        font-size: 1.1rem;
+        color: #555;
+        line-height: 1.6;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+</style>
+
+<div class="header-container">
+    <h1 class="sub-header">Welcome to the AI & ML Playground</h1>
+    <h3 class="main-header">Explore, Experiment, and Learn with Interactive Models!</h3>
+    <p class="description">
+        Test various machine learning models with real-time visualization and parameter controls.<br>
+        Explore models like Regression, Classification, Clustering, and much more!
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
+
 
 #--------------------------------------current time----------------------------------------------------|
 
