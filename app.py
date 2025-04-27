@@ -655,9 +655,21 @@ if st.session_state['chatbot_open']:
 # Add custom CSS for the bottom-right position of the rating section
 
 
-if st.button("Want2Rate"):
+if "rating_submitted" not in st.session_state:
+    st.session_state["rating_submitted"] = False
+    st.session_state["rating"] = 3  # Default rating value
+
+if st.button("Rate This App 🌟"):
     # Rating section
-    rating =st.slider("Rate this model (1-5 stars)", min_value=1, max_value=5, value=3, step=1)
+    with st.form("rating_form"):
+        st.subheader("We value your feedback!")
+        st.session_state["rating"] = st.slider("How would you rate this app? (1-5 stars)", min_value=1, max_value=5, value=3, step=1, key="rating_slider")
+        submit_button = st.form_submit_button("Submit Rating")
+        if submit_button:
+            st.session_state["rating_submitted"] = True
+
+if st.session_state.get("rating_submitted", False):
+    st.success(f"Thank you for rating us {st.session_state['rating']} star(s)! 🌟")
 
 #=================================================Footer======================================================|
 # Footer section
