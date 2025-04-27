@@ -4,8 +4,6 @@ import pandas as pd
 import numpy as np
 import joblib
 import matplotlib.pyplot as plt
-
-
 #==============================================================================================|
 
 # Customizing header
@@ -381,8 +379,7 @@ elif model_choice == "Recommendation":
         for movie in recommendations:
            st.write(f"⭐ {movie}")
 
-# Footer
-    st.markdown("<br><p style='text-align:center; font-size:14px; color:gray;'>Developed by Nithish, Yashas and Team 🚀</p>", unsafe_allow_html=True)
+
 
    
 #====================================================================================================|
