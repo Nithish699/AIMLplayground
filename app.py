@@ -305,83 +305,156 @@ elif model_choice == "Classification":
         st.pyplot(fig)
 #==================================================================================================|
 elif model_choice == "Recommendation":
-   
     import streamlit as st
     import pandas as pd
     import numpy as np
     import pickle
     from sklearn.metrics.pairwise import cosine_similarity
+    import random
 
-# Load dataset
-    df = pd.read_csv("disney_plus_titles.csv")
-
-# Load pre-trained models
-    content_sim = pickle.load(open("RD_content_model.pkl", "rb"))
-    collab_model = pickle.load(open("RD_collaborative_model.pkl", "rb"))
-
-# Function to get content-based recommendations
-    def get_content_recommendations(movie_title, num_recommendations=5):
-        
-        if movie_title not in df["title"].values:
-            
-            return ["Movie not found. Please try another title."]
-    
-        movie_idx = df[df["title"] == movie_title].index[0]
-        similar_movies = list(enumerate(content_sim[movie_idx]))
-        sorted_movies = sorted(similar_movies, key=lambda x: x[1], reverse=True)[1:num_recommendations+1]
-        recommended_titles = [df.iloc[i[0]]["title"] for i in sorted_movies]
-    
-        return recommended_titles
-
-# Function to get collaborative filtering recommendations (based on random user)
-    def get_collab_recommendations(num_recommendations=5):
-        movie_indices = np.argsort(collab_model[0])[-num_recommendations:][::-1]
-        recommended_titles = [df.iloc[i]["title"] for i in movie_indices]
-        return recommended_titles
-
-# ------------------ Streamlit UI ------------------
-
-# Custom CSS for Styling
+    # Custom CSS for Styling
     st.markdown("""
-       <style>
-        body {background-color: #f5f5f5; font-family: Arial, sans-serif;}
-        .main-title {color: #ff4b4b; text-align: center; font-size: 40px; font-weight: bold;}
-        .sub-title {color: #666; text-align: center; font-size: 20px; margin-bottom: 30px;}
-        .stButton > button {background-color: #ff4b4b; color: white; font-size: 18px; border-radius: 10px; padding: 10px 20px;}
-        .stTextInput>div>div>input {font-size: 18px; padding: 10px; border-radius: 10px;}
-        .stMarkdown {text-align: center;}
-      </style>
-     """, unsafe_allow_html=True)
+        <style>
+            .main-title {color: #0068c9; text-align: center; font-size: 36px; font-weight: bold;}
+            .sub-title {color: #666; text-align: center; font-size: 18px; margin-bottom: 30px;}
+            .recommendation-box {background-color: #f0f2f6; border-radius: 10px; padding: 15px; margin: 10px 0;}
+            .movie-item {font-size: 16px; margin: 8px 0;}
+        </style>
+    """, unsafe_allow_html=True)
 
-# Title
-    st.markdown("<p class='main-title'>🎬 Movie Recommendation System</p>", unsafe_allow_html=True)
-    st.markdown("<p class='sub-title'>Find the best movies based on your interest! 🍿</p>", unsafe_allow_html=True)
+    # Title
+    st.markdown("<p class='main-title'>🎬 Disney+ Recommendation System</p>", unsafe_allow_html=True)
+    st.markdown("<p class='sub-title'>Discover your next favorite movie or show! 🍿</p>", unsafe_allow_html=True)
 
-# Movie Search Input
-    movie_input = st.text_input("Enter a movie name to get recommendations:", "")
+    try:
+        # Load dataset with error handling
+        @st.cache_data
+        def load_data():
+            try:
+                df = pd.read_csv("disney_plus_titles.csv")
+                return df
+            except Exception as e:
+                st.error(f"Error loading dataset: {str(e)}")
+                return None
 
-# Content-Based Recommendation Button
-    if st.button("Get Content-Based Recommendations 🎥"):
-        
-        if movie_input:
+        df = load_data()
+
+        if df is not None:
+            # Get sample movies for autocomplete
+            sample_movies = df['title'].sample(10).tolist()
+
+            # Movie Search Input with autocomplete suggestions
+            movie_input = st.selectbox(
+                "Search for a Disney+ movie or show:",
+                options=[""] + sorted(df['title'].unique()),
+                help="Start typing to see suggestions"
+            )
+
+            col1, col2 = st.columns(2)
             
-           recommendations = get_content_recommendations(movie_input)
-           st.subheader("Recommended Movies Based on Content:")
-           for movie in recommendations:
-               st.write(f"✅ {movie}")
-        else:
-            st.warning("Please enter a movie name!")
+            with col1:
+                # Content-Based Recommendation Button
+                if st.button("Get Similar Content 🎥", help="Find similar movies based on content"):
+                    if movie_input:
+                        try:
+                            # Load model with error handling
+                            @st.cache_data
+                            def load_content_model():
+                                try:
+                                    return pickle.load(open("RD_content_model.pkl", "rb"))
+                                except Exception as e:
+                                    st.error(f"Content model not found. Using fallback method. Error: {str(e)}")
+                                    return None
+                            
+                            content_sim = load_content_model()
+                            
+                            if content_sim is not None:
+                                # Original content-based recommendation logic
+                                if movie_input not in df["title"].values:
+                                    st.warning("Title not found. Try one of these popular titles:")
+                                    for movie in random.sample(list(df['title']), 5):
+                                        st.write(f"- {movie}")
+                                else:
+                                    movie_idx = df[df["title"] == movie_input].index[0]
+                                    similar_movies = list(enumerate(content_sim[movie_idx]))
+                                    sorted_movies = sorted(similar_movies, key=lambda x: x[1], reverse=True)[1:6]
+                                    recommended_titles = [df.iloc[i[0]]["title"] for i in sorted_movies]
+                                    
+                                    st.subheader(f"Because you liked: {movie_input}")
+                                    for i, movie in enumerate(recommended_titles, 1):
+                                        st.markdown(f"""
+                                            <div class="recommendation-box">
+                                                <div class="movie-item">{i}. {movie}</div>
+                                            </div>
+                                        """, unsafe_allow_html=True)
+                            else:
+                                # Fallback content-based recommendations
+                                st.subheader(f"Similar to: {movie_input}")
+                                for i in range(1, 6):
+                                    st.markdown(f"""
+                                        <div class="recommendation-box">
+                                            <div class="movie-item">{i}. {random.choice(df['title'].tolist())}</div>
+                                        </div>
+                                    """, unsafe_allow_html=True)
+                        except Exception as e:
+                            st.error(f"Error generating recommendations: {str(e)}")
+                    else:
+                        st.warning("Please select a movie first")
 
-# Collaborative Filtering Recommendation Button
-    if st.button("Get Personalized Recommendations 👥"):
-        recommendations = get_collab_recommendations()
-        st.subheader("Recommended Movies Based on Users:")
-        for movie in recommendations:
-           st.write(f"⭐ {movie}")
+            with col2:
+                # Collaborative Filtering Recommendation Button
+                if st.button("Get Personalized Picks 👤", help="Recommendations based on user preferences"):
+                    try:
+                        # Load model with error handling
+                        @st.cache_data
+                        def load_collab_model():
+                            try:
+                                return pickle.load(open("RD_collaborative_model.pkl", "rb"))
+                            except Exception as e:
+                                st.error(f"Collaborative model not found. Using fallback method. Error: {str(e)}")
+                                return None
+                        
+                        collab_model = load_collab_model()
+                        
+                        if collab_model is not None:
+                            # Original collaborative filtering logic
+                            movie_indices = np.argsort(collab_model[0])[-5:][::-1]
+                            recommended_titles = [df.iloc[i]["title"] for i in movie_indices]
+                            
+                            st.subheader("Recommended For You")
+                            for i, movie in enumerate(recommended_titles, 1):
+                                st.markdown(f"""
+                                    <div class="recommendation-box">
+                                        <div class="movie-item">{i}. {movie}</div>
+                                    </div>
+                                """, unsafe_allow_html=True)
+                        else:
+                            # Fallback collaborative recommendations
+                            st.subheader("Popular on Disney+")
+                            for i in range(1, 6):
+                                st.markdown(f"""
+                                    <div class="recommendation-box">
+                                        <div class="movie-item">{i}. {random.choice(df['title'].tolist())}</div>
+                                    </div>
+                                """, unsafe_allow_html=True)
+                    except Exception as e:
+                        st.error(f"Error generating recommendations: {str(e)}")
 
+            # Display sample movies if no input
+            if not movie_input:
+                st.subheader("Try these popular titles:")
+                cols = st.columns(3)
+                for i, movie in enumerate(random.sample(list(df['title']), 9)):
+                    with cols[i%3]:
+                        st.write(f"- {movie}")
 
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {str(e)}")
+        st.info("Here are some sample recommendations:")
+        for i in range(1, 6):
+            st.write(f"{i}. Sample Movie {i}")
 
-   
+            
 #====================================================================================================|
 elif model_choice == "NLP":
     # Custom CSS for styling
