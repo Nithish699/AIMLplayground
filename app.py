@@ -128,97 +128,182 @@ if model_choice=="Not Yet choose the model":
                 st.warning("📈 Too low! Try again.")
 
 
-
+#--------------------------------------------------------------------------------------|
     
  
 elif model_choice == "Regression":
-    st.title("Regression Models")
-    st.write("Here are two regression models you can explore:")
+    st.markdown("""
+    <style>
+        .regression-header {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .prediction-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .stButton>button {
+            background-color: #3498db;
+            color: white;
+            border-radius: 5px;
+            padding: 8px 16px;
+            font-weight: bold;
+        }
+        .feature-input {
+            margin-bottom: 15px;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
-    # Sub-selection for Regression Models (Weather Forecasting or Car Price Prediction)
+    st.markdown('<h1 class="regression-header">Regression Models</h1>', unsafe_allow_html=True)
+    st.write("Explore these predictive models:")
+
+    # Model selection with improved layout
     regression_choice = st.radio(
         "Select Regression Model",
-        ["Select a model", "🏠 House Price Prediction", "🚗Car Price Prediction"]
+        ["Select a model", "🏠 House Price Prediction", "🚗 Car Price Prediction"],
+        horizontal=True
     )
 
     if regression_choice == "🏠 House Price Prediction":
+        st.markdown('<h2 class="regression-header">🏠 House Price Prediction</h2>', unsafe_allow_html=True)
+        st.write("Predict residential property values based on key features")
         
-        # Load the saved house price model
-        model = joblib.load('house_price_model.pkl')
-
-        st.title("🏠 House Price Prediction")
-        st.write("Enter details below to predict the house price:")
-
-        #  inputs
-        size = st.number_input("Enter house size in sqft:", step=100, value=1000)
-        bedrooms = st.number_input("Enter number of bedrooms:", step=1, value=2)
-
-       # Predict button
-        if st.button("Predict Price"):
-           
-           input_data = np.array([[size, bedrooms]])
-           prediction = model.predict(input_data)
-           st.write(f"💰 Predicted Price: $.{prediction[0]:,.2f}")
+        col1, col2 = st.columns(2)
         
+        with col1:
+            size = st.number_input(
+                "House size (sqft)", 
+                min_value=500, 
+                max_value=10000, 
+                step=100, 
+                value=1500,
+                key="house_size"
+            )
+        
+        with col2:
+            bedrooms = st.number_input(
+                "Number of bedrooms", 
+                min_value=1, 
+                max_value=10, 
+                step=1, 
+                value=3,
+                key="bedrooms"
+            )
 
+        if st.button("Predict House Price", key="house_price_btn"):
+            try:
+                model = joblib.load('house_price_model.pkl')
+                input_data = np.array([[size, bedrooms]])
+                prediction = model.predict(input_data)
+                
+                st.markdown(f"""
+                <div class="prediction-card">
+                    <h3>Prediction Result</h3>
+                    <p style="font-size: 24px; color: #2ecc71; font-weight: bold;">
+                        ${prediction[0]:,.2f}
+                    </p>
+                    <p>Based on {bedrooms} bedroom house of {size:,} sqft</p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            except Exception as e:
+                st.error(f"Error making prediction: {str(e)}")
 
+    elif regression_choice == "🚗 Car Price Prediction":
+        st.markdown('<h2 class="regression-header">🚗 Car Price Prediction</h2>', unsafe_allow_html=True)
+        st.write("Estimate used car values based on vehicle specifications")
+        
+        with st.expander("Enter Car Details", expanded=True):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                year = st.number_input(
+                    "Manufacturing Year", 
+                    min_value=1990, 
+                    max_value=2023, 
+                    step=1, 
+                    value=2018
+                )
+                present_price = st.number_input(
+                    "Current Showroom Price (₹ lakhs)", 
+                    min_value=1.0, 
+                    max_value=100.0, 
+                    step=0.5, 
+                    value=5.0
+                )
+                kms_driven = st.number_input(
+                    "Kilometers Driven", 
+                    min_value=0, 
+                    max_value=300000, 
+                    step=1000, 
+                    value=50000
+                )
+                
+            with col2:
+                fuel_type = st.selectbox(
+                    "Fuel Type", 
+                    ["Petrol", "Diesel", "CNG"],
+                    index=0
+                )
+                seller_type = st.selectbox(
+                    "Seller Type", 
+                    ["Dealer", "Individual"],
+                    index=0
+                )
+                transmission = st.selectbox(
+                    "Transmission", 
+                    ["Manual", "Automatic"],
+                    index=0
+                )
+                owner = st.select_slider(
+                    "Number of Previous Owners", 
+                    options=[0, 1, 2, 3],
+                    value=0
+                )
 
+        if st.button("Predict Car Price", key="car_price_btn"):
+            try:
+                model = joblib.load('car_price_prediction_model.pkl')
+                
+                # Encoding mapping
+                fuel_mapping = {"Petrol": 0, "Diesel": 1, "CNG": 2}
+                seller_mapping = {"Dealer": 0, "Individual": 1}
+                trans_mapping = {"Manual": 0, "Automatic": 1}
 
+                user_data = pd.DataFrame({
+                    'Year': [year],
+                    'Present_Price': [present_price],
+                    'Kms_Driven': [kms_driven],
+                    'Fuel_Type': [fuel_mapping[fuel_type]],
+                    'Seller_Type': [seller_mapping[seller_type]],
+                    'Transmission': [trans_mapping[transmission]],
+                    'Owner': [owner]
+                })
 
- #==========================================Car Price Prediction====================================================================|       
-
-    elif regression_choice == "🚗Car Price Prediction":
-        st.subheader("🚗Car Price Prediction")
-        st.write("This model predicts the price of a car based on features like make, model, mileage, and other attributes.")
-        # Add interactivity for Car Price Prediction model here
-        # For now, just showing a placeholder message
-        st.write("You can play with the car price prediction data here (this is a placeholder for now).")
-       
-        # Load the model
-        model = joblib.load('car_price_prediction_model.pkl')
-
-# Define the Streamlit app
-        st.title("Car Price Prediction App")
-
-        st.header("Enter Car Details")
-
-# Input fields for user data
-        year = st.number_input("Year of Purchase", min_value=2000, max_value=2023, step=1, value=2015)
-        present_price = st.number_input("Present Price (in lakhs)", min_value=0.0, step=0.1, value=5.0)
-        kms_driven = st.number_input("KMs Driven", min_value=0, step=500, value=30000)
-        fuel_type = st.selectbox("Fuel Type", ["Petrol", "Diesel", "CNG"])
-        seller_type = st.selectbox("Seller Type", ["Dealer", "Individual"])
-        transmission = st.selectbox("Transmission Type", ["Manual", "Automatic"])
-        owner = st.number_input("Number of Previous Owners", min_value=0, max_value=3, step=1, value=0)
-
-# Encoding user inputs
-        fuel_mapping = {"Petrol": 0, "Diesel": 1, "CNG": 2}
-        seller_mapping = {"Dealer": 0, "Individual": 1}
-        trans_mapping = {"Manual": 0, "Automatic": 1}
-
-        user_data = pd.DataFrame({
-       'Year': [year],
-    'Present_Price': [present_price],
-    'Kms_Driven': [kms_driven],
-    'Fuel_Type': [fuel_mapping[fuel_type]],
-    'Seller_Type': [seller_mapping[seller_type]],
-    'Transmission': [trans_mapping[transmission]],
-    'Owner': [owner]
-       })
-
-# Prediction button
-        if st.button("Predict Selling Price"):
-           prediction = model.predict(user_data)
-           st.subheader("Predicted Selling Price")
-           st.write(f"🚗 ₹ {prediction[0]:.2f} lakhs")
-    
-    
-        else:
-           st.write("Enter car details in the sidebar and click 'Predict Selling Price'.")
-
+                prediction = model.predict(user_data)
+                
+                st.markdown(f"""
+                <div class="prediction-card">
+                    <h3>Predicted Selling Price</h3>
+                    <p style="font-size: 28px; color: #e74c3c; font-weight: bold;">
+                        ₹ {prediction[0]:.2f} lakhs
+                    </p>
+                    <p>
+                        {year} {fuel_type} car | {kms_driven:,} km | {transmission}
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            except Exception as e:
+                st.error(f"Error making prediction: {str(e)}")
 
     else:
-        st.write("Please select a regression model to explore.")
+        st.info("👈 Please select a regression model to get started")
 # ================================================================================================|
 elif model_choice == "Classification":
     import streamlit as st
@@ -454,7 +539,7 @@ elif model_choice == "Recommendation":
         for i in range(1, 6):
             st.write(f"{i}. Sample Movie {i}")
 
-            
+
 #====================================================================================================|
 elif model_choice == "NLP":
     # Custom CSS for styling
